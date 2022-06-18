@@ -2,7 +2,12 @@
 
 // imports
 import {Blockchain, functionalBlockchain} from './blockchain.js';
-import {Block, functionalBlock} from './block.js';
+import {
+    Block,
+    functionalBlock as functionalBlockchainExample,
+    functionalBlock as functionalBlockExample,
+    functionalBlock
+} from './block.js';
 
 let accountChain = new Blockchain();
 console.log("Creating account chain...");
@@ -25,7 +30,7 @@ functionalBlockExample.props = {
     timestamp: functionalApp.props.timestamp.push(Date.now()),
     data: functionalApp.props.data.push("this is some data"),
     previousHash: functionalApp.props.previousHash.push(""),
-    hash: functionalApp.props.hash.push(functionalApp.methods.genHash()),
+    hash: functionalApp.props.hash.push(functionalBlockchainExample.methods.genHash()),
 }
 
 functionalApp.props.chain.push(functionalBlock)
