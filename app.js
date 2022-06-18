@@ -4,10 +4,9 @@
 import {Blockchain} from './blockchain.js';
 import {Block} from './block.js';
 
-let accountChain = new Blockchain();
-console.log("Creating account chain...");
+Blockchain.methods.setFirstBlock();
 
-accountChain.setNewBlock(
+Blockchain.methods.setNewBlock(
     new Block(1, Date.now(), {
         key: "value",
         age: 99,
@@ -15,4 +14,4 @@ accountChain.setNewBlock(
     })
 );
 
-console.log(JSON.stringify(accountChain, null, 5));
+console.dir(Blockchain.props.chain);
