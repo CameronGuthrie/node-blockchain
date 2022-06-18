@@ -1,8 +1,8 @@
 'use strict'
 
 // imports
-import {Blockchain} from './blockchain.js';
-import {Block} from './block.js';
+import {Blockchain, functionalBlockchain} from './blockchain.js';
+import {Block, functionalBlock} from './block.js';
 
 let accountChain = new Blockchain();
 console.log("Creating account chain...");
@@ -16,3 +16,16 @@ accountChain.setNewBlock(
 );
 
 console.log(JSON.stringify(accountChain, null, 5));
+
+// functional app
+const functionalApp = functionalBlockchain
+
+functionalBlockExample.props = {
+    index: functionalApp.props.index.push(1),
+    timestamp: functionalApp.props.timestamp.push(Date.now()),
+    data: functionalApp.props.data.push("this is some data"),
+    previousHash: functionalApp.props.previousHash.push(""),
+    hash: functionalApp.props.hash.push(functionalApp.methods.genHash()),
+}
+
+functionalApp.props.chain.push(functionalBlock)

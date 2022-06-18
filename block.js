@@ -27,4 +27,21 @@ class Block {
 // console.log(hash);
 
 // exports
-export {Block};
+
+
+const functionalBlock = {
+    props: {
+        index: [],
+        timestamp: [],
+        data: [],
+        previousHash: [],
+        hash: [],
+    },
+    methods: {
+        genHash: () => {
+            const hash = crypto.createHash('sha256').update(this.index + this.timestamp + JSON.stringify(this.data) + this.previousHash);
+            return hash.digest('hex');
+        }
+    }
+}
+export {Block, functionalBlock};

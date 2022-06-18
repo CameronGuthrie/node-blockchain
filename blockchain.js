@@ -55,5 +55,28 @@ class Blockchain {
     
 }
 
+const functionalBlockchain = {
+    props: {
+        chain: [],
+        //    don't need getters or setters just access the chain directly
+    }, methods: {
+        checkChain: ()=> {
+            for(const [i, block] of this.chain.entries()) {
+                // select a block
+                const currentBlock = block;
+                // and the previous block
+                const previousBlock = this.chain[i - 1];
+                // if the hash of the block doesn't match the computed hash
+                // then chain integrity is bad
+                if (currentBlock.hash !== currentBlock.genHash()) return false;
+                // if the hash of the previous block in current block doesn't match the hash of the previous block in the previous block
+                // then chain integrity is bad
+                if (currentBlock.previousHash !== previousBlock.hash) return false;
+                // otherwise chain integrity is good
+                return true;
+            }
+        }
+    }
+}
 // exports
-export {Blockchain};
+export {Blockchain, functionalBlockchain};
