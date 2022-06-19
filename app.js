@@ -4,14 +4,10 @@
 import {Blockchain} from './blockchain.js';
 import {Block} from './block.js';
 
+const addBlock = data => Blockchain.methods.setNewBlock(new Block(Blockchain.props.chain.length,Date.now(),data));
+
 Blockchain.methods.setFirstBlock();
 
-Blockchain.methods.setNewBlock(
-    new Block(1, Date.now(), {
-        key: "value",
-        age: 99,
-        string: "this is a string"
-    })
-);
+addBlock({name: "Jeff", age: 21, bool: true});
 
 console.dir(Blockchain.props.chain);
