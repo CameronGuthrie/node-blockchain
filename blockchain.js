@@ -33,13 +33,20 @@ const Blockchain = {
 */
 
         checkConstraint: (hash) => { // make this complicated later
-            const constraint = 'I am a string';
-            return typeof(constraint) === typeof(hash) ? true : false;
+            const constraint = 'c';
+            return constraint === hash.charAt(0);
+            // return typeof(constraint) === typeof(hash) ? true : false;
         }, 
 
         nextN: block => {
             block.n++;
             block.genHash();
+
+            // why is the hash always the same????
+            console.dir(block.n);
+            console.dir(block.hash);
+
+
             return block;
         },
 
@@ -48,16 +55,12 @@ const Blockchain = {
                 const newBlock = Blockchain.methods.nextN(block);
                 return Blockchain.methods.checkConstraint(newBlock.hash) ? newBlock : () => mine(Blockchain.methods.nextN(block));
             }
-
-            return mine(Blockchain.methods.nextN(block));
-
-            // fix trampoline before using this
-            // return Blockchain.methods.trampoline(mine(Blockchain.methods.nextN(block)));
+            return Blockchain.methods.trampoline(mine(Blockchain.methods.nextN(block)));
         },
 
-        // HOW DO I GET THIS TO STOP RETURNING ANONYMOUS FUNCTIONS!?!?!?!!!!!
-        trampoline: fn => (...args) => { 
-            let res = fn(...args);
+        // should maybe add ...args back in here later
+        trampoline: fn => {
+            let res = fn;
             while(typeof res === 'function') {
                 res = res();
             }
