@@ -16,6 +16,7 @@ const Blockchain = {
         setNewBlock: (data) => {
             const block = new Block(Blockchain.props.chain.length, data, Blockchain.methods.getLatestBlock().hash, 0);
             Blockchain.props.chain.push(Blockchain.methods.mineBlock(block));
+            console.dir(block);
         },
 
 /*
@@ -33,20 +34,14 @@ const Blockchain = {
 */
 
         checkConstraint: (hash) => { // make this complicated later
-            const constraint = 'c';
-            return constraint === hash.charAt(0);
-            // return typeof(constraint) === typeof(hash) ? true : false;
+            // hash must start with...
+            const constraint = '000';
+            return constraint === hash.slice(0,constraint.length);
         }, 
 
         nextN: block => {
             block.n++;
-            block.genHash();
-
-            // why is the hash always the same????
-            console.dir(block.n);
-            console.dir(block.hash);
-
-
+            block.hash = block.genHash();
             return block;
         },
 
