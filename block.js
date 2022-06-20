@@ -4,12 +4,12 @@
 const crypto = await import('crypto');
 
 class Block {
-    constructor (index, data, previousHash, n) {
+    constructor (index, data, previousHash, nOnce) {
         this.index = index;
         this.timestamp = Date.now();
         this.data = data;
         this.previousHash = previousHash;
-        this.n = n;
+        this.nOnce = nOnce;
         this.hash = this.genHash();
     }
     genHash = () => crypto.createHash('sha256').update(
@@ -17,7 +17,7 @@ class Block {
                         this.timestamp + 
                         JSON.stringify(this.data) + 
                         this.previousHash + 
-                        this.n
+                        this.nOnce
                     ).digest('hex');
 }
 
