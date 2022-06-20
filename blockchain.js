@@ -9,19 +9,31 @@ const Blockchain = {
     },
     methods: {
 
-        setFirstBlock: () => Blockchain.props.chain.push(new Block(0, `Genesis Block`, ``, 0)),
+        setFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``, 0)),
 
         getLatestBlock: () => Blockchain.props.chain[Blockchain.props.chain.length - 1],
 
         setNewBlock: (data) => {
             const block = new Block(Blockchain.props.chain.length, data, Blockchain.methods.getLatestBlock().hash, 0);
-            Blockchain.props.chain.push(Blockchain.methods.mineBlock(block));
-            console.dir(block);
+            const newBlock = Blockchain.methods.mineBlock(block);
+            Blockchain.methods.validateBlock(newBlock) ? 
+                Blockchain.methods.addBlock(newBlock) : 
+                console.error('invalid block');
         },
 
-/*
-        // this isn't being used yet
-        checkChain: () => {
+        addBlock (newBlock) {
+            Blockchain.props.chain.push(newBlock);
+            console.dir(newBlock);
+        },
+
+        validateBlock: (newBlock) => {
+            const latestBlock = Blockchain.methods.getLatestBlock();
+            if (newBlock.hash !== newBlock.genHash()) return false;
+            if (latestBlock.hash !== newBlock.previousHash) return false;
+            return true;
+        },
+
+        validateChain: () => {
             if (index == 0) return true;
             for (let i = 1; i < Blockchain.props.chain.length; i++) {
                 const currentBlock = Blockchain.props.chain[i];
@@ -31,16 +43,15 @@ const Blockchain = {
                 return true;
             }
         },
-*/
 
-        checkConstraint: (hash) => { // make this complicated later
-            // hash must start with...
-            const constraint = '000';
+        proofOfWork: (hash) => { // make this complicated later
+            // for example: the hash must start with...
+            const constraint = '0000';
             return constraint === hash.slice(0,constraint.length);
         }, 
 
         nextN: block => {
-            block.n++;
+            block.nOnce++;
             block.hash = block.genHash();
             return block;
         },
@@ -48,7 +59,7 @@ const Blockchain = {
         mineBlock: (block) => {
             function mine(block) {
                 const newBlock = Blockchain.methods.nextN(block);
-                return Blockchain.methods.checkConstraint(newBlock.hash) ? newBlock : () => mine(Blockchain.methods.nextN(block));
+                return Blockchain.methods.proofOfWork(newBlock.hash) ? newBlock : () => mine(Blockchain.methods.nextN(block));
             }
             return Blockchain.methods.trampoline(mine(Blockchain.methods.nextN(block)));
         },
