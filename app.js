@@ -10,6 +10,6 @@ Blockchain.methods.setFirstBlock();
 addBlock({name: "Jeff", age: 21, bool: true});
 addBlock({name: "Jane", age: 32, bool: false});
 
-console.dir(Blockchain.props.chain);
+// console.dir(Blockchain.props.chain);
 
 // console.dir(Blockchain.methods.checkChain());
