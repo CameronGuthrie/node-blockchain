@@ -68,7 +68,7 @@ const Blockchain = {
         // the criteria a block's hash has to meet for the block to be added to the chain
         proofOfWork: (hash) => { // make this complicated later
             // for example: the hash must start with...
-            const constraint = '00000';
+            const constraint = '0000';
             return constraint === hash.slice(0,constraint.length);
         }, 
 
