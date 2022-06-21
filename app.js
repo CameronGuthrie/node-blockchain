@@ -3,8 +3,13 @@
 // imports
 import {Blockchain} from './blockchain.js';
 
-Blockchain.methods.setFirstBlock();
+// their are no blocks build a genesis block
+if (!Blockchain.props.length) Blockchain.methods.buildFirstBlock();
 
-Blockchain.methods.setNewBlock({name: "Penelope", age: 32, bool: false});
+// add some more blocks to the chain
 
-Blockchain.methods.setNewBlock({name: "Jeff", age: 21, bool: true});
+Blockchain.methods.buildNewBlock({name: "Penelope", age: 32, bool: false});
+
+Blockchain.methods.buildNewBlock({name: "Jeff", age: 21, bool: true});
+
+Blockchain.methods.buildNewBlock({name: "Old Person", age: 999, bool: false});
