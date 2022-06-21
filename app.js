@@ -3,7 +3,7 @@
 // imports
 import {Blockchain} from './blockchain.js';
 
-// their are no blocks build a genesis block
+// there are no blocks build a genesis block
 if (!Blockchain.props.length) Blockchain.methods.buildFirstBlock();
 
 // add some more blocks to the chain
