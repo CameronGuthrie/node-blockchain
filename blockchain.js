@@ -10,9 +10,11 @@ const Blockchain = {
     },
     methods: {
         // this is to build genesis block object and add it in the chain
+        // TODO [H] why is the first block empty? Maybe the first chain
         buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``, 0)),
 
         // this method will return the latest block in the chain
+        // TODO [H] why specifically the first method, I would suggest just a generic method to get a set block in your chain
         getLatestBlock: () => Blockchain.props.chain[Blockchain.props.chain.length - 1],
 
         // this is an object builder for new blocks
@@ -50,12 +52,14 @@ const Blockchain = {
             // check if the blockchain has more than one block
             if (Blockchain.props.chain.length >= 1) {
                 // loop through the chain
+                /* TODO [H] this for loop only ever loops once, it always returns something on the first iteration
+                   if it doesn't hit a return on either if statement it will always return true */
                 for (let i = 1; i < Blockchain.props.chain.length; i++) {
                     // get the block at position i
                     const currentBlock = Blockchain.props.chain[i];
                     // get the preceding block
                     const previousBlock = Blockchain.props.chain[i - 1];
-                    // theck that the hash of the block at i is correct
+                    // then that the hash of the block at i is correct
                     if (currentBlock.hash !== currentBlock.genHash()) return false;
                     // check that the hash of the block at i-1 is stored in the block at i
                     if (currentBlock.previousHash !== previousBlock.hash) return false;

@@ -9,6 +9,8 @@ class Block {
         // the position of the block in the chain
         this.index = index;
         // when the block was created
+        // TODO [H] Should grab this from a global, not sure how node calculates time,
+        //  could screw up if someone has their local times set wrong
         this.timestamp = Date.now();
         // the data contained inside the block
         this.data = data;
@@ -21,6 +23,7 @@ class Block {
     }
     // how we generate a sha256 hash using the crypto library inside Node.js
     // we hash everything inside of the block other than the hash itself
+    // TODO [H] Mixing data types, here we have string, number, a date, is this a good idea?
     genHash = () => crypto.createHash('sha256').update(
                         this.index + 
                         this.timestamp + 
