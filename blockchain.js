@@ -15,11 +15,12 @@ const Blockchain = {
 
         // this method will return the latest block in the chain
         // TODO [H] why specifically the first method, I would suggest just a generic method to get a set block in your chain
-        getLatestBlock: () => Blockchain.props.chain[Blockchain.props.chain.length - 1],
+        //          [C] Good idea, going to try this funky new at() method
+        getBlock: (index) => Blockchain.props.chain.at(index),
 
         // this is an object builder for new blocks
         buildNewBlock: (data) => {
-            const block = new Block(Blockchain.props.chain.length, data, Blockchain.methods.getLatestBlock().hash, 0);
+            const block = new Block(Blockchain.props.chain.length, data, Blockchain.methods.getBlock(-1).hash, 0);
             // call the mineBlock method to go through the process of getting a hash
             const newBlock = Blockchain.methods.mineBlock(block);
             // validate the chain then the block
@@ -39,7 +40,7 @@ const Blockchain = {
         // validate the new block
         validateBlock: (newBlock) => {
             // get the previous block
-            const latestBlock = Blockchain.methods.getLatestBlock();
+            const latestBlock = Blockchain.methods.getBlock(-1);
             // check the hash of the new block is correct
             if (newBlock.hash !== newBlock.genHash()) return false;
             // check the hash of the previous block is stored in the new block
@@ -54,6 +55,7 @@ const Blockchain = {
                 // loop through the chain
                 /* TODO [H] this for loop only ever loops once, it always returns something on the first iteration
                    if it doesn't hit a return on either if statement it will always return true */
+                   //       [C] You're right, the return true should be outside the for loop, fixes
                 for (let i = 1; i < Blockchain.props.chain.length; i++) {
                     // get the block at position i
                     const currentBlock = Blockchain.props.chain[i];
@@ -63,8 +65,8 @@ const Blockchain = {
                     if (currentBlock.hash !== currentBlock.genHash()) return false;
                     // check that the hash of the block at i-1 is stored in the block at i
                     if (currentBlock.previousHash !== previousBlock.hash) return false;
-                    return true;
                 }
+                return true;
             }
             return true;
         },
