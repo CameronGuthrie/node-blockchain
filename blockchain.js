@@ -5,22 +5,25 @@ import {Block} from './block.js'
 
 // the blockchain object
 const Blockchain = {
+
     props: {
         chain: [],
         pendingTransactions: []
     },
+
     methods: {
+
         // this is to build genesis block object and add it in the chain
-        buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``, 0)),
+        buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``)),
 
         // this method will return the latest block in the chain
         getBlock: (index) => Blockchain.props.chain.at(index),
 
         // this is an object builder for new blocks
-        buildNewBlock: (dataArray) => {
-            const block = new Block(Blockchain.props.chain.length, dataArray, Blockchain.methods.getBlock(-1).hash, 0);
+        buildNewBlock: (transactions) => {
+            const block = new Block(Blockchain.props.chain.length, transactions, Blockchain.methods.getBlock(-1).hash);
             // call the mineBlock method to go through the process of getting a hash
-            const newBlock = Blockchain.methods.mineBlock(block);
+            const newBlock = block.mineBlock(block);
             // validate the chain then the block
             Blockchain.methods.validateChain() ? 
                 (   Blockchain.methods.validateBlock(newBlock) ? 
@@ -65,49 +68,10 @@ const Blockchain = {
                 return true;
             }
             return true;
-        },
-
-        // the criteria a block's hash has to meet for the block to be added to the chain
-        proofOfWork: (hash) => { // make this complicated later
-            // for example: the hash must start with...
-            const constraint = '0000';
-            return constraint === hash.slice(0,constraint.length);
-        }, 
-
-        // iterate the single use number stored in each block
-        nextN: block => {
-            // iterate n Once
-            block.nOnce++;
-            // generate a new hash
-            block.hash = block.genHash();
-            // return the block
-            return block;
-        },
-
-        // mine a block - generate hashes until the proof of work is met
-        mineBlock: (block) => {
-            // mine a block
-            function mine(block) {
-                // iterate the n Once of the block and generate a new hash
-                const newBlock = Blockchain.methods.nextN(block);
-                // if the new hash satisfies the proof of work return the block
-                // else mine a new hash for the block
-                return Blockchain.methods.proofOfWork(newBlock.hash) ? newBlock : () => mine(newBlock);
-            }
-            // use the trampoline function to handle the recustion and return a mined block
-            return Blockchain.methods.trampoline(mine(block));
-        },
-
-        // using trampoline to get around maximum call stack size exceeded
-        // should eventually replace this with tail call in mineBlock function if support gets added again
-        trampoline: fn => {
-            let res = fn;
-            while(typeof res === 'function') {
-                res = res();
-            }
-            return res;
         }
+
     }
+
 }
 
 // exports
