@@ -6,21 +6,19 @@ import {Block} from './block.js'
 // the blockchain object
 const Blockchain = {
     props: {
-        chain: []
+        chain: [],
+        pendingTransactions: []
     },
     methods: {
         // this is to build genesis block object and add it in the chain
-        // TODO [H] why is the first block empty? Maybe the first chain
         buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``, 0)),
 
         // this method will return the latest block in the chain
-        // TODO [H] why specifically the first method, I would suggest just a generic method to get a set block in your chain
-        //          [C] Good idea, going to try this funky new at() method
         getBlock: (index) => Blockchain.props.chain.at(index),
 
         // this is an object builder for new blocks
-        buildNewBlock: (data) => {
-            const block = new Block(Blockchain.props.chain.length, data, Blockchain.methods.getBlock(-1).hash, 0);
+        buildNewBlock: (dataArray) => {
+            const block = new Block(Blockchain.props.chain.length, dataArray, Blockchain.methods.getBlock(-1).hash, 0);
             // call the mineBlock method to go through the process of getting a hash
             const newBlock = Blockchain.methods.mineBlock(block);
             // validate the chain then the block
@@ -33,6 +31,7 @@ const Blockchain = {
 
         // pushes new blocks to the chain and outputs them to console
         addBlock (newBlock) {
+            newBlock.timestamp = newBlock.getTime();
             Blockchain.props.chain.push(newBlock);
             console.dir(newBlock);
         },
@@ -53,9 +52,6 @@ const Blockchain = {
             // check if the blockchain has more than one block
             if (Blockchain.props.chain.length >= 1) {
                 // loop through the chain
-                /* TODO [H] this for loop only ever loops once, it always returns something on the first iteration
-                   if it doesn't hit a return on either if statement it will always return true */
-                   //       [C] You're right, the return true should be outside the for loop, fixes
                 for (let i = 1; i < Blockchain.props.chain.length; i++) {
                     // get the block at position i
                     const currentBlock = Blockchain.props.chain[i];
