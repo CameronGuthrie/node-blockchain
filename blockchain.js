@@ -25,11 +25,9 @@ const Blockchain = {
             // call the mineBlock method to go through the process of getting a hash
             const newBlock = block.mineBlock(block);
             // validate the chain then the block
-            Blockchain.methods.validateChain() ? 
-                (   Blockchain.methods.validateBlock(newBlock) ? 
-                    Blockchain.methods.addBlock(newBlock) : 
-                    console.error(`invalid block : ${newBlock}`)  ) :
-                console.error('invalid chain');
+            if (!Blockchain.methods.validateChain()) throw new Error('invalid chain');
+            if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block :\n${newBlock}`); 
+            Blockchain.methods.addBlock(newBlock);
         },
 
         // pushes new blocks to the chain and outputs them to console
@@ -53,7 +51,7 @@ const Blockchain = {
         // validate the whole chain
         validateChain: () => {
             // check if the blockchain has more than one block
-            if (Blockchain.props.chain.length >= 1) {
+            if (Blockchain.props.chain.length) { // <- truthy/falsey principles so don't need >= 1
                 // loop through the chain
                 for (let i = 1; i < Blockchain.props.chain.length; i++) {
                     // get the block at position i
