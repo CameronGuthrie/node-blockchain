@@ -8,7 +8,7 @@ const Blockchain = {
 
     props: {
         chain: [],
-        pendingTransactions: []
+        mempool: []
     },
 
     methods: {
@@ -20,10 +20,10 @@ const Blockchain = {
         getBlock: (index) => Blockchain.props.chain.at(index),
 
         // this is an object builder for new blocks
-        buildNewBlock: (transactions) => {
-            const block = new Block(Blockchain.props.chain.length, transactions, Blockchain.methods.getBlock(-1).hash);
+        buildNewBlock: (minerAddress) => {
+            const block = new Block(Blockchain.props.chain.length, Blockchain.props.mempool, Blockchain.methods.getBlock(-1).hash);
             // call the mineBlock method to go through the process of getting a hash
-            const newBlock = block.mineBlock(block);
+            const newBlock = block.mine(block);
             // validate the chain then the block
             if (!Blockchain.methods.validateChain()) throw new Error('invalid chain');
             if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block :\n${newBlock}`); 
@@ -66,6 +66,19 @@ const Blockchain = {
                 return true;
             }
             return true;
+        },
+
+        // add a transaction to the mempool
+        addToMempool(transaction) {
+
+            // if there is no form address or to address throw an error
+            if (!transaction.fromAddress || !transaction.toAddress) throw new Error('Transaction must include both a from and to address');
+
+            // if the transaction is not valid throw an error
+            if (!transaction.isValid()) throw new Error('Cannot add invalid transaction to chain');
+
+            // add transaction to the mempool
+            this.mempool.push(transaction);
         }
 
     }

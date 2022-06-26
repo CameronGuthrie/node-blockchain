@@ -9,8 +9,8 @@ class Block {
     constructor (index, transactions, previousHash) {
         // the position of the block in the chain
         this.index = index;
-        // when the block was created
-        // this.timestamp = this.getTime();
+                    // time when the block was created
+                    // this.timestamp = this.getTime();
         // array of transactions contained inside the block
         this.transactions = transactions;
         // the hash of the preceding block
@@ -42,7 +42,7 @@ class Block {
     }
 
     // simple function to generate hashes until proof of work is satisfied
-    mineBlock = () => {
+    mine = () => {
         // while proof of work is not satisfied
         while (!this.proofOfWork(this.hash)) {
             // iterate the n Once

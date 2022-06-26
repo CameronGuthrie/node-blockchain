@@ -15,7 +15,7 @@ class Transaction {
         this.toAddress = toAddress;
         this.ammount = ammount;
         // this.timestamp = this.getTime();
-        //this.hash = this.genHash();
+        // this.hash = this.genHash();
     }
 
     // method to hash the transaction
