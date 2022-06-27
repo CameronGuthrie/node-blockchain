@@ -9,8 +9,6 @@ class Block {
     constructor (index, transactions, previousHash) {
         // the position of the block in the chain
         this.index = index;
-                    // time when the block was created
-                    // this.timestamp = this.getTime();
         // array of transactions contained inside the block
         this.transactions = transactions;
         // the hash of the preceding block
@@ -21,15 +19,13 @@ class Block {
         this.hash = this.genHash();
     }
 
-    // how we generate a sha256 hash using the crypto library inside Node.js
-    // we hash everything inside of the block other than the hash itself
+    // generate a sha256 hash using the crypto library inside Node.js
     genHash = () => crypto.createHash('sha256').update(
-                        this.index.toString() + 
-                        // this.timestamp.toString() + 
-                        JSON.stringify(this.transactions) + 
-                        this.previousHash.toString() + 
-                        this.nOnce.toString()
-                    ).digest('hex');
+        this.index.toString() + 
+        JSON.stringify(this.transactions) + 
+        this.previousHash.toString() + 
+        this.nOnce.toString()
+    ).digest('hex');
 
     // method to return a date as number of miliseconds from epoch in UTC 
     getTime = () => new Date()[Symbol.toPrimitive]('number');
@@ -37,7 +33,7 @@ class Block {
     // the criteria a block's hash has to meet for the block to be added to the chain
     proofOfWork = (hash) => { // make this complicated later
         // for example: the hash must start with...
-        const constraint = '0000';
+        const constraint = '00000';
         return constraint === hash.slice(0,constraint.length);
     }
 

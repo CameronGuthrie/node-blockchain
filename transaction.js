@@ -5,9 +5,10 @@ const {
     crypto,
     createECDH,
     ECDH
-  } = await import('crypto');
+} = await import('crypto');
+// set up Bitcoin style key exchange
 const ecdh = createECDH('secp256k1');
-ecdh.generateKeys();
+// ecdh.generateKeys();
 
 class Transaction {
     constructor (fromAddress, toAddress, ammount) {
@@ -18,7 +19,7 @@ class Transaction {
         // this.hash = this.genHash();
     }
 
-    // method to hash the transaction
+    // method to hash the transaction from node.js crypto lib
     genHash = () => crypto.createHash('sha256').update(
         this.fromAddress.toString() + 
         this.toAddress.toString() + 
@@ -37,6 +38,10 @@ class Transaction {
         // check the sender public key is the one used
         if (signingKey.getPublic('hex') !== this.fromAddress) throw new Error('Cannot sign from wallet address provided');
 
+        const publicKey = ECDH.convertKey('secp256k1', 'hex', 'hex', this.fromAddress, 'uncompressed');
+
+
+/*
         // set up the hash of the transaction
         this.hash = this.genHash();
 
@@ -44,7 +49,8 @@ class Transaction {
         const sign = signingKey.sign(this.hash, 'base64');
 
         // Convert the signature to DER format (binary using Derencoding)
-        this.signature - sign.toDer('hex');
+        this.signature = sign.toDer('hex');
+*/
     }
 }
 

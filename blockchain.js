@@ -2,13 +2,15 @@
 
 // imports
 import {Block} from './block.js'
+import {Transaction} from './transaction.js';
 
 // the blockchain object
 const Blockchain = {
 
     props: {
-        chain: [],
-        mempool: []
+        chain: [], 
+        mempool: [],
+        reward : 2
     },
 
     methods: {
@@ -28,12 +30,17 @@ const Blockchain = {
             if (!Blockchain.methods.validateChain()) throw new Error('invalid chain');
             if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block :\n${newBlock}`); 
             Blockchain.methods.addBlock(newBlock);
+            // add the reward for mining to the mempool
+            Blockchain.props.mempool = [new Transaction(null, minerAddress, Blockchain.props.reward)]
         },
 
         // pushes new blocks to the chain and outputs them to console
         addBlock (newBlock) {
+            // set the timestamp for the block
             newBlock.timestamp = newBlock.getTime();
+            // add the block the the end of the chain
             Blockchain.props.chain.push(newBlock);
+            // output the block to console
             console.dir(newBlock);
         },
 
@@ -51,7 +58,7 @@ const Blockchain = {
         // validate the whole chain
         validateChain: () => {
             // check if the blockchain has more than one block
-            if (Blockchain.props.chain.length) { // <- truthy/falsey principles so don't need >= 1
+            if (Blockchain.props.chain.length) {
                 // loop through the chain
                 for (let i = 1; i < Blockchain.props.chain.length; i++) {
                     // get the block at position i
@@ -79,6 +86,24 @@ const Blockchain = {
 
             // add transaction to the mempool
             this.mempool.push(transaction);
+        },
+
+        // set balance on all addresses
+        getAddressBalance(address) {
+            // set balance to zero
+            let balance = 0;
+            // loop through every block in the chain
+            for (const block of Blockchain.props.chain) {
+                // loop through every transaction in the block
+                for(const transaction of block.transactions) {
+                    // if the address is sending then reduce the balance by the sent ammount
+                    if (transaction.fromAddress === address) balance -= transaction.ammount;
+                    // if the address is recieving then increase the balance by the sent ammount
+                    if (transaction.toAddress === address) balance += transaction.ammount;
+                }
+            }
+            // return the balance
+            return balance;
         }
 
     }
