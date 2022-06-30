@@ -5,37 +5,62 @@ const crypto = await import('crypto');
 
 // the block class
 class Block {
-    constructor (index, data, previousHash, nOnce) {
-        // the position of the block in the chain
+
+    constructor (index, transactions, previousHash) {
+        // the position of the block in the chain (sometimes called height)
         this.index = index;
-        // when the block was created
-        // TODO [H] Should grab this from a global, not sure how node calculates time,
-        //  could screw up if someone has their local times set wrong
-        //      [C] So calling a method to get the time now, 
-        //          only fix for system time would be pinging a server for the time I think
-        this.timestamp = this.getTime();
-        // the data contained inside the block
-        this.data = data;
+        // array of transactions contained inside the block
+        this.transactions = transactions;
         // the hash of the preceding block
         this.previousHash = previousHash;
         // a single use number for re-hashing the block
-        this.nOnce = nOnce;
+        this.nOnce = 0;
         // the hash of the block
         this.hash = this.genHash();
     }
-    // how we generate a sha256 hash using the crypto library inside Node.js
-    // we hash everything inside of the block other than the hash itself
-    // TODO [H] Mixing data types, here we have string, number, a date, is this a good idea?
-    //          [C] All strings now... should prevent any issues (though I think it auto mutated everything but the custom object)
+
+    // generate a sha256 hash using the crypto library inside Node.js
     genHash = () => crypto.createHash('sha256').update(
-                        this.index.toString() + 
-                        this.timestamp.toString() + 
-                        JSON.stringify(this.data) + 
-                        this.previousHash.toString() + 
-                        this.nOnce.toString()
-                    ).digest('hex');
+        this.index.toString() + 
+        JSON.stringify(this.transactions) + 
+        this.previousHash.toString() + 
+        this.nOnce.toString()
+    ).digest('hex');
+
     // method to return a date as number of miliseconds from epoch in UTC 
     getTime = () => new Date()[Symbol.toPrimitive]('number');
+
+    // the criteria a block's hash has to meet for the block to be added to the chain
+    proofOfWork = (hash) => { // make this complicated later
+        // for example: the hash must start with...
+        const constraint = '00000';
+        return constraint === hash.slice(0,constraint.length);
+    }
+
+    // simple function to generate hashes until proof of work is satisfied
+    mine = () => {
+        // while proof of work is not satisfied
+        while (!this.proofOfWork(this.hash)) {
+            // iterate the n Once
+            this.nOnce++;
+            // generate a new hash
+            this.hash = this.genHash();
+        }
+        // return the block
+        return this;
+    }
+
+    // validate the transactions 
+    validateAllTransactions = () => {
+        // enhanced for loop over transaction array
+        for (const transaction of this.transactions) {
+            // if the transaction is not valid return false
+            if (!transaction.validateTransaction()) return false;
+        }
+        // if everything is valid then
+        return true
+    }
+
 }
 
 // exports

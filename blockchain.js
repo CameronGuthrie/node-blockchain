@@ -2,38 +2,45 @@
 
 // imports
 import {Block} from './block.js'
+import {Transaction} from './transaction.js';
 
 // the blockchain object
 const Blockchain = {
+
     props: {
-        chain: []
+        chain: [], 
+        mempool: [],
+        reward : 2
     },
+
     methods: {
+
         // this is to build genesis block object and add it in the chain
-        // TODO [H] why is the first block empty? Maybe the first chain
-        buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``, 0)),
+        buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, [], `Genesis Block`, ``)),
 
         // this method will return the latest block in the chain
-        // TODO [H] why specifically the first method, I would suggest just a generic method to get a set block in your chain
-        //          [C] Good idea, going to try this funky new at() method
         getBlock: (index) => Blockchain.props.chain.at(index),
 
         // this is an object builder for new blocks
-        buildNewBlock: (data) => {
-            const block = new Block(Blockchain.props.chain.length, data, Blockchain.methods.getBlock(-1).hash, 0);
+        buildNewBlock: (minerAddress) => {
+            const block = new Block(Blockchain.props.chain.length, Blockchain.props.mempool, Blockchain.methods.getBlock(-1).hash);
             // call the mineBlock method to go through the process of getting a hash
-            const newBlock = Blockchain.methods.mineBlock(block);
+            const newBlock = block.mine(block);
             // validate the chain then the block
-            Blockchain.methods.validateChain() ? 
-                (   Blockchain.methods.validateBlock(newBlock) ? 
-                    Blockchain.methods.addBlock(newBlock) : 
-                    console.error(`invalid block : ${newBlock}`)  ) :
-                console.error('invalid chain');
+            if (!Blockchain.methods.validateChain()) throw new Error('invalid chain');
+            if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block`); 
+            Blockchain.methods.addBlock(newBlock);
+            // add the reward for mining to the mempool
+            Blockchain.props.mempool = [new Transaction(null, minerAddress, Blockchain.props.reward)]
         },
 
         // pushes new blocks to the chain and outputs them to console
         addBlock (newBlock) {
+            // set the timestamp for the block
+            newBlock.timestamp = newBlock.getTime();
+            // add the block the the end of the chain
             Blockchain.props.chain.push(newBlock);
+            // output the block to console
             console.dir(newBlock);
         },
 
@@ -45,17 +52,16 @@ const Blockchain = {
             if (newBlock.hash !== newBlock.genHash()) return false;
             // check the hash of the previous block is stored in the new block
             if (latestBlock.hash !== newBlock.previousHash) return false;
+            // check that all transactions in the block are valid
+            if (!latestBlock.validateAllTransactions()) return false;
             return true;
         },
 
         // validate the whole chain
         validateChain: () => {
             // check if the blockchain has more than one block
-            if (Blockchain.props.chain.length >= 1) {
+            if (Blockchain.props.chain.length) {
                 // loop through the chain
-                /* TODO [H] this for loop only ever loops once, it always returns something on the first iteration
-                   if it doesn't hit a return on either if statement it will always return true */
-                   //       [C] You're right, the return true should be outside the for loop, fixes
                 for (let i = 1; i < Blockchain.props.chain.length; i++) {
                     // get the block at position i
                     const currentBlock = Blockchain.props.chain[i];
@@ -71,47 +77,38 @@ const Blockchain = {
             return true;
         },
 
-        // the criteria a block's hash has to meet for the block to be added to the chain
-        proofOfWork: (hash) => { // make this complicated later
-            // for example: the hash must start with...
-            const constraint = '0000';
-            return constraint === hash.slice(0,constraint.length);
-        }, 
+        // add a transaction to the mempool
+        addToMempool(transaction) {
+            // if there is no form address or to address throw an error
+            if (!transaction.fromAddress || !transaction.toAddress) throw new Error('Transaction must include both a from and to address');
 
-        // iterate the single use number stored in each block
-        nextN: block => {
-            // iterate n Once
-            block.nOnce++;
-            // generate a new hash
-            block.hash = block.genHash();
-            // return the block
-            return block;
+            // if the transaction is not valid throw an error
+            if (!transaction.validateTransaction()) throw new Error('Cannot add invalid transaction to chain');
+
+            // add transaction to the mempool
+            Blockchain.props.mempool.push(transaction);
         },
 
-        // mine a block - generate hashes until the proof of work is met
-        mineBlock: (block) => {
-            // mine a block
-            function mine(block) {
-                // iterate the n Once of the block and generate a new hash
-                const newBlock = Blockchain.methods.nextN(block);
-                // if the new hash satisfies the proof of work return the block
-                // else mine a new hash for the block
-                return Blockchain.methods.proofOfWork(newBlock.hash) ? newBlock : () => mine(newBlock);
+        // set balance on all addresses
+        getAddressBalance(address) {
+            // set balance to zero
+            let balance = 0;
+            // loop through every block in the chain
+            for (const block of Blockchain.props.chain) {
+                // loop through every transaction in the block
+                for(const transaction of block.transactions) {
+                    // if the address is sending then reduce the balance by the sent ammount
+                    if (transaction.fromAddress === address) balance -= transaction.ammount;
+                    // if the address is recieving then increase the balance by the sent ammount
+                    if (transaction.toAddress === address) balance += transaction.ammount;
+                }
             }
-            // use the trampoline function to handle the recustion and return a mined block
-            return Blockchain.methods.trampoline(mine(block));
-        },
-
-        // using trampoline to get around maximum call stack size exceeded
-        // should eventually replace this with tail call in mineBlock function if support gets added again
-        trampoline: fn => {
-            let res = fn;
-            while(typeof res === 'function') {
-                res = res();
-            }
-            return res;
+            // return the balance
+            return balance;
         }
+
     }
+
 }
 
 // exports
