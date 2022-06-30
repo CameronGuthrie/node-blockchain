@@ -1,11 +1,8 @@
 'use strict'
 
 // imports
-const {
-    crypto,
-    createECDH,
-    ECDH
-} = await import('crypto');
+import {crypto,createECDH,ECDH} from 'crypto';
+
 // set up Bitcoin style key exchange
 const ecdh = createECDH('secp256k1');
 // ecdh.generateKeys();
