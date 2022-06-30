@@ -28,26 +28,17 @@ const tx1 = new Transaction(walletOne.publicKey, walletTwo.publicKey, 10);
 tx1.signTransaction(walletOne);
 Blockchain.methods.addToMempool(tx1);
 
-const tx2 = new Transaction(walletOne.publicKey, walletThree.publicKey, 4);
-tx2.signTransaction(walletOne);
-Blockchain.methods.addToMempool(tx2);
-
-const tx3 = new Transaction(walletOne.publicKey, walletThree.publicKey, 1);
-tx3.signTransaction(walletOne);
-Blockchain.methods.addToMempool(tx3);
-
 // mine block with transactions
 Blockchain.methods.buildNewBlock(miningWallet.publicKey);
 
-
 // create MORE transactions
-const tx4 = new Transaction(walletThree.publicKey, walletOne.publicKey, 5);
-tx4.signTransaction(walletThree);
-Blockchain.methods.addToMempool(tx4);
+const tx2 = new Transaction(walletThree.publicKey, walletOne.publicKey, 5);
+tx2.signTransaction(walletThree);
+Blockchain.methods.addToMempool(tx2);
 
-const tx5 = new Transaction(walletTwo.publicKey, walletThree.publicKey, 12);
-tx5.signTransaction(walletTwo);
-Blockchain.methods.addToMempool(tx5);
+const tx3 = new Transaction(walletTwo.publicKey, walletThree.publicKey, 12);
+tx3.signTransaction(walletTwo);
+Blockchain.methods.addToMempool(tx3);
 
 // mine block with transactions
 Blockchain.methods.buildNewBlock(miningWallet.publicKey);
