@@ -1,19 +1,13 @@
 'use strict'
 
 // imports
-import {crypto,createECDH,ECDH} from 'crypto';
-
-// set up Bitcoin style key exchange
-const ecdh = createECDH('secp256k1');
-// ecdh.generateKeys();
+const crypto = await import('crypto');
 
 class Transaction {
     constructor (fromAddress, toAddress, ammount) {
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.ammount = ammount;
-        // this.timestamp = this.getTime();
-        // this.hash = this.genHash();
     }
 
     // method to hash the transaction from node.js crypto lib
@@ -26,30 +20,41 @@ class Transaction {
     // method to return a date as number of miliseconds from epoch in UTC 
     getTime = () => new Date()[Symbol.toPrimitive]('number');
 
-    // key shenanigans
-    signTransaction(signingKey) {
-        
-        // check transaction is valid
+    // sign the transaction
+    signTransaction(wallet) {
+        // check the sender public key is the one used
+        // right now this just checks the public key matches the 'from' address
+        if (wallet.publicKey !== this.fromAddress) throw new Error('Cannot sign from wallet address provided');
+
+        // set the time of transaction
+        this.timestamp = this.getTime();
+
+        //sign the transaction (need to create a private key object)
+        this.signature = crypto.sign('sha256', this.genHash(), crypto.createPrivateKey({  key: wallet.pair.privateKey, format: "der",type: "pkcs8"}));
+    }
+
+    validateTransaction = () => {
+        // for miner fee, from address is empty so cannot verify
         if (this.fromAddress === null) return true;
 
-        // check the sender public key is the one used
-        if (signingKey.getPublic('hex') !== this.fromAddress) throw new Error('Cannot sign from wallet address provided');
+        // is the transaction signed?
+        if (!this.signature || this.signature.length === 0) throw new Error('Transaction is not signed');
 
-        const publicKey = ECDH.convertKey('secp256k1', 'hex', 'hex', this.fromAddress, 'uncompressed');
-
-
-/*
-        // set up the hash of the transaction
-        this.hash = this.genHash();
-
-        // sign with the key, passing in the hash, encoding with base 64
-        const sign = signingKey.sign(this.hash, 'base64');
-
-        // Convert the signature to DER format (binary using Derencoding)
-        this.signature = sign.toDer('hex');
-*/
+        // return if transaction signature is verified
+        return crypto.verify('sha256', this.genHash(), crypto.createPublicKey({key: Buffer.from(this.fromAddress, 'hex'), format: 'der', type:'spki'}), this.signature);
     }
+
 }
+
+import * as wallet from './wallet.js';
+
+const wallet1 = wallet.createWallet();
+
+const tx = new Transaction(wallet1.publicKey, 'go somewhere', 10);
+
+tx.signTransaction(wallet1);
+tx.validateTransaction();
+console.dir(tx)
 
 // exports
 export {Transaction};
