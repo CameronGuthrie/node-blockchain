@@ -7,7 +7,7 @@
 // imports
 const crypto = await import('crypto');
 
-const createWallet = () => {
+export const createWallet = () => {
 
     // generates a pair of keys, returns them as buffers
     const pair = crypto.generateKeyPairSync('ec', {
@@ -17,7 +17,7 @@ const createWallet = () => {
             format: 'der'
         },
         privateKeyEncoding: {
-            type: 'pkcs8', // 'pkcs8',
+            type: 'pkcs8',
             format: 'der'
         }
     });
@@ -39,9 +39,7 @@ const createWallet = () => {
         privateKeyObject,
         pair
     }
-}
-const wallet1 = createWallet();
-const wallet2 = createWallet();
+}    
 
 // create a public key object from a private key object
 const pubFromPriv = key => crypto.createPublicKey(key);
@@ -49,5 +47,5 @@ const pubFromPriv = key => crypto.createPublicKey(key);
 // convert public key from object to hex
 const publicKeyToHex = key => key.export({format: 'buffer', type : 'spki', format : 'der'}).toString('hex');
 
-console.log(publicKeyToHex(pubFromPriv(wallet1.privateKeyObject)) === wallet1.publicKey);
-
+// validate wallet
+export const validateWallet = wallet => publicKeyToHex(pubFromPriv(wallet.privateKeyObject)) === wallet.publicKey;
