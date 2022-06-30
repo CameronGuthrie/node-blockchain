@@ -23,38 +23,44 @@ class Transaction {
     // sign the transaction
     signTransaction(wallet) {
         // check the sender public key is the one used
-        // right now this just checks the public key matches the 'from' address
+        // right now this just checks the public key matches the 'fromAddress'
         if (wallet.publicKey !== this.fromAddress) throw new Error('Cannot sign from wallet address provided');
 
         // set the time of transaction
         this.timestamp = this.getTime();
 
         //sign the transaction (need to create a private key object)
-        this.signature = crypto.sign('sha256', this.genHash(), crypto.createPrivateKey({  key: wallet.pair.privateKey, format: "der",type: "pkcs8"}));
+        this.signature =    crypto.sign(
+                                'sha256', // algorithm
+                                this.genHash(), // data
+                                crypto.createPrivateKey({  // private key (need to build an object)
+                                    key: wallet.pair.privateKey, // key from buffer
+                                    format: "der", // format of key
+                                    type: "pkcs8" // type of key
+                                })
+                            );
     }
 
     validateTransaction = () => {
-        // for miner fee, from address is empty so cannot verify
+        // for miner fee 'fromAddress' is empty so cannot verify
         if (this.fromAddress === null) return true;
 
         // is the transaction signed?
         if (!this.signature || this.signature.length === 0) throw new Error('Transaction is not signed');
 
-        // return if transaction signature is verified
-        return crypto.verify('sha256', this.genHash(), crypto.createPublicKey({key: Buffer.from(this.fromAddress, 'hex'), format: 'der', type:'spki'}), this.signature);
+        // return boolean of if transaction signature is verified
+        return crypto.verify(
+                'sha256', // algorithm
+                this.genHash(), //data
+                crypto.createPublicKey({ // public key (need to build an object)
+                    key: Buffer.from(this.fromAddress, 'hex'), // key from buffer
+                    format: 'der', // format of key
+                    type:'spki'// type of key
+                }), 
+                this.signature); // signature
     }
 
 }
-
-import * as wallet from './wallet.js';
-
-const wallet1 = wallet.createWallet();
-
-const tx = new Transaction(wallet1.publicKey, 'go somewhere', 10);
-
-tx.signTransaction(wallet1);
-tx.validateTransaction();
-console.dir(tx)
 
 // exports
 export {Transaction};

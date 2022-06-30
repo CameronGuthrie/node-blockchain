@@ -16,7 +16,7 @@ const Blockchain = {
     methods: {
 
         // this is to build genesis block object and add it in the chain
-        buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, `Genesis Block`, ``)),
+        buildFirstBlock: () => Blockchain.methods.addBlock(new Block(0, [], `Genesis Block`, ``)),
 
         // this method will return the latest block in the chain
         getBlock: (index) => Blockchain.props.chain.at(index),
@@ -28,7 +28,7 @@ const Blockchain = {
             const newBlock = block.mine(block);
             // validate the chain then the block
             if (!Blockchain.methods.validateChain()) throw new Error('invalid chain');
-            if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block :\n${newBlock}`); 
+            if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block`); 
             Blockchain.methods.addBlock(newBlock);
             // add the reward for mining to the mempool
             Blockchain.props.mempool = [new Transaction(null, minerAddress, Blockchain.props.reward)]
@@ -52,6 +52,8 @@ const Blockchain = {
             if (newBlock.hash !== newBlock.genHash()) return false;
             // check the hash of the previous block is stored in the new block
             if (latestBlock.hash !== newBlock.previousHash) return false;
+            // check that all transactions in the block are valid
+            if (!latestBlock.validateAllTransactions()) return false;
             return true;
         },
 
@@ -77,15 +79,14 @@ const Blockchain = {
 
         // add a transaction to the mempool
         addToMempool(transaction) {
-
             // if there is no form address or to address throw an error
             if (!transaction.fromAddress || !transaction.toAddress) throw new Error('Transaction must include both a from and to address');
 
             // if the transaction is not valid throw an error
-            if (!transaction.isValid()) throw new Error('Cannot add invalid transaction to chain');
+            if (!transaction.validateTransaction()) throw new Error('Cannot add invalid transaction to chain');
 
             // add transaction to the mempool
-            this.mempool.push(transaction);
+            Blockchain.props.mempool.push(transaction);
         },
 
         // set balance on all addresses

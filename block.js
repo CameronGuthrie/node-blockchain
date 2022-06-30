@@ -7,7 +7,7 @@ const crypto = await import('crypto');
 class Block {
 
     constructor (index, transactions, previousHash) {
-        // the position of the block in the chain
+        // the position of the block in the chain (sometimes called height)
         this.index = index;
         // array of transactions contained inside the block
         this.transactions = transactions;
@@ -50,15 +50,16 @@ class Block {
         return this;
     }
 
-    // // validate the transactions 
-    // validateTransactions = () => {
-    //     // enhanced for loop over transaction array
-    //     for (let item of this.transactions) {
-    //         if (!item.)
-    //     }
-    //     // if everything is valid then
-    //     return true
-    // }
+    // validate the transactions 
+    validateAllTransactions = () => {
+        // enhanced for loop over transaction array
+        for (const transaction of this.transactions) {
+            // if the transaction is not valid return false
+            if (!transaction.validateTransaction()) return false;
+        }
+        // if everything is valid then
+        return true
+    }
 
 }
 
