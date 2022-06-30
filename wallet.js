@@ -22,13 +22,6 @@ export const createWallet = () => {
         }
     });
 
-    // convert privateKey buffer to a private key object
-    const privateKeyObject = crypto.createPrivateKey({  
-        key: pair.privateKey,
-        format: "der",
-        type: "pkcs8"
-    });
-
     // keys to hex for easy access
     const publicKey = pair.publicKey.toString('hex');
     const privateKey = pair.privateKey.toString('hex');
@@ -36,10 +29,12 @@ export const createWallet = () => {
     return {
         publicKey,
         privateKey,
-        privateKeyObject,
         pair
     }
 }    
+/*
+// convert privateKey buffer to a private key object
+const genPrivateKeyObject = buffer => crypto.createPrivateKey({  key: buffer, format: "der",type: "pkcs8"});
 
 // create a public key object from a private key object
 const pubFromPriv = key => crypto.createPublicKey(key);
@@ -48,4 +43,24 @@ const pubFromPriv = key => crypto.createPublicKey(key);
 const publicKeyToHex = key => key.export({format: 'buffer', type : 'spki', format : 'der'}).toString('hex');
 
 // validate wallet
-export const validateWallet = wallet => publicKeyToHex(pubFromPriv(wallet.privateKeyObject)) === wallet.publicKey;
+export const validateWallet = wallet => publicKeyToHex(pubFromPriv(genPrivateKeyObject(wallet.pair.privateKey))) === wallet.publicKey;
+*/
+
+// validate wallet
+export const validateWallet = wallet => {
+    // convert privateKey buffer to a private key object
+    const privateKeyObject = crypto.createPrivateKey({  key: wallet.pair.privateKey, format: "der",type: "pkcs8"});
+
+    // create a public key object from a private key object
+    const publicKeyObject = crypto.createPublicKey(privateKeyObject);
+
+    // convert public key object to hex
+    const publicKeyHex = publicKeyObject.export({format: 'buffer', type : 'spki', format : 'der'}).toString('hex');
+
+    // compare generated hex public key to wallet hex public key
+    return publicKeyHex === wallet.publicKey;
+}
+
+// quick test
+const newWallet = createWallet();
+console.log(validateWallet(newWallet));
