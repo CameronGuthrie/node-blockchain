@@ -28,7 +28,8 @@ const Blockchain = {
             const newBlock = block.mine(block);
             // validate the chain then the block
             if (!Blockchain.methods.validateChain()) throw new Error('invalid chain');
-            if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block`); 
+            if (!Blockchain.methods.validateBlock(newBlock)) throw new Error(`invalid block`);
+            // add the block to the chain
             Blockchain.methods.addBlock(newBlock);
             // add the reward for mining to the mempool
             Blockchain.props.mempool = [new Transaction(null, minerAddress, Blockchain.props.reward)]
@@ -40,8 +41,15 @@ const Blockchain = {
             newBlock.timestamp = newBlock.getTime();
             // add the block the the end of the chain
             Blockchain.props.chain.push(newBlock);
+            
+/*
+            STOPPING DOING THIS FOR A BIT
+            
             // output the block to console
             console.dir(newBlock);
+*/
+
+
         },
 
         // validate the new block

@@ -9,8 +9,8 @@ import {Blockchain} from './blockchain.js'
 class Controller {
 
     // return all of the blocks in the chain
-    getBlocks() {
-        return JSON.stringify(Blockchain.props.chain);
+    getChain() {
+        return Blockchain.props.chain;
     }
 
     // return the mempool (all pending transactions)
@@ -18,9 +18,12 @@ class Controller {
         return Blockchain.props.mempool;
     }
 
-    // return block by index
-    getBlock(index) {
-        return JSON.stringify(Blockchain.methods.getBlock(index));
+    // return block by hash
+    getBlock(hash) {
+        for (const block of Blockchain.props.chain){
+            if (block.hash === hash) return block;
+        }
+        return `Block with index ${index} not found`;
     }
 
     // return all transactions in a block
@@ -28,11 +31,10 @@ class Controller {
         return Blockchain.methods.getBlock(index).transactions;
     }
 
-    // return transaction by id
+    // return transaction by id (hash)
     getTransaction(txid) {
-        let tx;
-        for (const block in Blockchain.props.chain){
-            for (const transaction in block.transactions) {
+        for (const block of Blockchain.props.chain){
+            for (const transaction of block.transactions) {
                 if (transaction.txid === txid) return transaction;
             }
         }

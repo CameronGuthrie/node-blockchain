@@ -47,56 +47,35 @@ Blockchain.methods.buildNewBlock(miningWallet.publicKey);
 
 // imports
 import {Controller} from './controller.js';
-const controller = new Controller();
-const http = await import('http');
 import express from 'express';
-const bodyParser = await import('body-parser');
-const PORT = process.env.PORT || 9001;
-const STARTMESSAGE = process.env.STARTMESSAGE || `Server listening on port ${PORT}`;
 
-const server = http.createServer((req, res) => {
+// spin up the app
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
-    switch (req.url) {
-        case '/helloworld':
-            // write the response body
-            res.write('<h1>Hello world!</h1>');
-            // end the response
-            res.end();
-            break;
-        case '/blockchain':
-            // write the response head
-            res.writeHead(200, {'Content-Type' : 'application/json'});
-            // write the response body
-            res.write(controller.getBlocks());
-            // end the response
-            res.end();
-            break;
-        case '/mempool':
-            // write the response head
-            res.writeHead(200, {'Content-Type' : 'application/json'});
-            // write the response body
-            res.write(controller.getMempool());
-            // end the response
-            res.end();
-            break;
-        case '/block/:id':
-            // write the response head
-            res.writeHead(200, {'Content-Type' : 'application/json'});
-            // write the response body
-            res.write(controller.getBlock(req.url.params.id));
-            // end the response
-            res.end();
-            break;
-        default:
-            res.write(STARTMESSAGE);
-            // end the response
-            res.end();
-            break;
-    }
-    
-  });
-  server.on('clientError', (err, socket) => {
-    console.error(err);
-    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-  });
-  server.listen(PORT, () => console.log(STARTMESSAGE));
+// grab endpoint behaviour from the controller
+const controller = new Controller();
+
+// get the whole chain
+app.get('/blockchain', (req, res) => {
+    res.json(controller.getChain()).end();
+});
+
+// get pending transactions
+app.get('/mempool', (req, res) => {
+    res.json(controller.getMempool()).end();
+});
+
+// get a specific block
+app.get('/block/:id', (req, res) => {
+    res.json(controller.getBlock(req.params.id)).end();
+});
+
+// get a specific transaction
+app.get('/transaction/:id', (req, res) => {
+    res.json(controller.getTransaction(req.params.id)).end();
+});
+
+// exports
+export {app};

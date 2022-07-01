@@ -2,7 +2,7 @@
 
 I'll periodically update this project.
 
-As of right now there are no packages to install.
+The project now has an API created using express so run `npm i` after you clone it down to install packages!
 
 Simply clone down the repo, cd into the directory and use `npm start` to run the application.
 
