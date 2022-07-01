@@ -49,7 +49,8 @@ Blockchain.methods.buildNewBlock(miningWallet.publicKey);
 import {Controller} from './controller.js';
 const controller = new Controller();
 const http = await import('http');
-//const bodyParser = await import('body-parser');
+import express from 'express';
+const bodyParser = await import('body-parser');
 const PORT = process.env.PORT || 9001;
 const STARTMESSAGE = process.env.STARTMESSAGE || `Server listening on port ${PORT}`;
 
