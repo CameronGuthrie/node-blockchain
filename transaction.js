@@ -12,10 +12,9 @@ class Transaction {
 
     // method to hash the transaction from node.js crypto lib
     genHash = () => crypto.createHash('sha256').update(
-        this.fromAddress.toString() + 
-        this.toAddress.toString() + 
-        this.ammount.toString()
-    ).digest('hex');
+            this.fromAddress.toString() + 
+            this.toAddress.toString() + 
+            this.ammount.toString()).digest('hex');
 
     // method to return a date as number of miliseconds from epoch in UTC 
     getTime = () => new Date()[Symbol.toPrimitive]('number');
@@ -28,6 +27,9 @@ class Transaction {
 
         // set the time of transaction
         this.timestamp = this.getTime();
+
+        // set the id of the transaction
+        this.txid = this.genHash();
 
         //sign the transaction (need to create a private key object)
         this.signature =    crypto.sign(
@@ -49,15 +51,16 @@ class Transaction {
         if (!this.signature || this.signature.length === 0) throw new Error('Transaction is not signed');
 
         // return boolean of if transaction signature is verified
-        return crypto.verify(
-                'sha256', // algorithm
-                this.genHash(), //data
-                crypto.createPublicKey({ // public key (need to build an object)
-                    key: Buffer.from(this.fromAddress, 'hex'), // key from buffer
-                    format: 'der', // format of key
-                    type:'spki'// type of key
-                }), 
-                this.signature); // signature
+        return  crypto.verify(
+                    'sha256', // algorithm
+                    this.genHash(), //data
+                    crypto.createPublicKey({ // public key (need to build an object)
+                        key: Buffer.from(this.fromAddress, 'hex'), // key from buffer
+                        format: 'der', // format of key
+                        type:'spki'// type of key
+                    }), 
+                    this.signature // signature
+                ); 
     }
 
 }
