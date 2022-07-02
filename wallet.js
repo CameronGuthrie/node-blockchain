@@ -1,3 +1,4 @@
+'use strict'
 /*
 
     THIS IS GOING TO BE HERE FOR NOW

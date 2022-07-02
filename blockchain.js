@@ -8,9 +8,9 @@ import {Transaction} from './transaction.js';
 class Blockchain {
 
     constructor (chain) {
-        this.chain = chain || [new Block(0, [], `Genesis Block`, ``)], // WHEN A CLASS, CREATE GENESIS BLOCK !!!! SANATISE DATA !!!!
+        this.chain = chain || [new Block(0, [], `Genesis Block`, ``)], // if blockchain is empty, create genesis block
         this.mempool = [], // pending transactions
-        this.reward = 2 // reward for mining a block
+        this.reward = Number(2) // reward for mining a block
     }
 
     // this method will return the latest block in the chain
@@ -27,7 +27,7 @@ class Blockchain {
         // add the block to the chain
         this.addBlock(newBlock);
         // add the reward for mining to the mempool
-        this.mempool = [new Transaction(null, minerAddress, this.reward)]
+        this.mempool = [new Transaction('reward', minerAddress, this.reward)]
     }
 
     // pushes new blocks to the chain and outputs them to console
@@ -77,10 +77,8 @@ class Blockchain {
     addToMempool = (transaction) => {
         // if there is no form address or to address throw an error
         if (!transaction.fromAddress || !transaction.toAddress) throw new Error('Transaction must include both a from and to address');
-
         // if the transaction is not valid throw an error
-        if (!transaction.validateTransaction()) throw new Error('Cannot add invalid transaction to chain');
-
+        if (!transaction.validateTransaction()) throw new Error('Cannot add invalid transaction');
         // add transaction to the mempool
         this.mempool.push(transaction);
     }
@@ -90,14 +88,21 @@ class Blockchain {
         // set balance to zero
         let balance = 0;
         // loop through every block in the chain
-        for (const block of Blockchain.props.chain) {
+        for (const block of this.chain) {
             // loop through every transaction in the block
             for(const transaction of block.transactions) {
                 // if the address is sending then reduce the balance by the sent ammount
-                if (transaction.fromAddress === address) balance -= transaction.ammount;
+                if (transaction.fromAddress === address) balance -= transaction.amount;
                 // if the address is recieving then increase the balance by the sent ammount
-                if (transaction.toAddress === address) balance += transaction.ammount;
+                if (transaction.toAddress === address) balance += transaction.amount;
             }
+        }
+        // also need to loop through the mempool
+        for (const transaction of this.mempool) {
+            // if the address is sending then reduce the balance by the sent ammount
+            if (transaction.fromAddress === address) balance -= transaction.amount;
+            // if the address is recieving then increase the balance by the sent ammount
+            if (transaction.toAddress === address) balance += transaction.amount;
         }
         // return the balance
         return balance;

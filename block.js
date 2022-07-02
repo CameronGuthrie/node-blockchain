@@ -6,17 +6,12 @@ const crypto = await import('crypto');
 // the block class
 class Block {
 
-    constructor (index, transactions, previousHash) {
-        // the position of the block in the chain (sometimes called height)
-        this.index = index;
-        // array of transactions contained inside the block
-        this.transactions = transactions;
-        // the hash of the preceding block
-        this.previousHash = previousHash;
-        // a single use number for re-hashing the block
-        this.nOnce = 0;
-        // the hash of the block
-        this.hash = this.genHash();
+    constructor (index, transactions, previousHash) { 
+        this.index = Number(index); // the position of the block in the chain (sometimes called height)
+        this.transactions = transactions ;// array of transactions contained inside the block
+        this.previousHash = String(previousHash); // the hash of the preceding block
+        this.nOnce = Number(0); // a single use number for re-hashing the block
+        this.hash = String(this.genHash()); // the hash of the block
     }
 
     // generate a sha256 hash using the crypto library inside Node.js
