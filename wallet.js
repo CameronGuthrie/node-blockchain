@@ -33,20 +33,5 @@ const createWallet = () => {
     }
 }
 
-// validate wallet
-const validateWallet = wallet => {
-    // convert privateKey buffer to a private key object
-    const privateKeyObject = crypto.createPrivateKey({  key: wallet.pair.privateKey, format: "der",type: "pkcs8"});
-
-    // create a public key object from a private key object
-    const publicKeyObject = crypto.createPublicKey(privateKeyObject);
-
-    // convert public key object to hex
-    const publicKeyHex = publicKeyObject.export({format: 'buffer', type : 'spki', format : 'der'}).toString('hex');
-
-    // compare generated hex public key to wallet hex public key
-    return publicKeyHex === wallet.publicKey;
-}
-
 // exports
-export {createWallet, validateWallet};
+export {createWallet};

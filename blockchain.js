@@ -8,7 +8,7 @@ import {Transaction} from './transaction.js';
 const Blockchain = {
 
     props: {
-        chain: [], 
+        chain: [], // WHEN A CLASS, CREATE GENESIS BLOCK !!!! SANATISE DATA !!!!
         mempool: [],
         reward : 2
     },
@@ -36,7 +36,7 @@ const Blockchain = {
         },
 
         // pushes new blocks to the chain and outputs them to console
-        addBlock (newBlock) {
+        addBlock: (newBlock) => {
             // set the timestamp for the block
             newBlock.timestamp = newBlock.getTime();
             // add the block the the end of the chain
@@ -86,7 +86,7 @@ const Blockchain = {
         },
 
         // add a transaction to the mempool
-        addToMempool(transaction) {
+        addToMempool: (transaction) => {
             // if there is no form address or to address throw an error
             if (!transaction.fromAddress || !transaction.toAddress) throw new Error('Transaction must include both a from and to address');
 
@@ -98,7 +98,7 @@ const Blockchain = {
         },
 
         // set balance on all addresses
-        getAddressBalance(address) {
+        getAddressBalance: (address) => {
             // set balance to zero
             let balance = 0;
             // loop through every block in the chain
