@@ -13,8 +13,15 @@ class Blockchain {
         this.reward = Number(2) // reward for mining a block
     }
 
-    // this method will return the latest block in the chain
+    // this method will return the block at the specified index
     getBlock = (index) => this.chain.at(index);
+
+    // this method will return the block with the matching hash
+    getBlockWithHash = (hash) => {
+        for (const block of this.chain){
+            if (block.hash === hash) return block;
+        }
+    }
 
     // this is an object builder for new blocks
     buildNewBlock = (minerAddress) => {

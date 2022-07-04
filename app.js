@@ -20,7 +20,7 @@ const walletTwo = wallet.createWallet();
 const walletThree = wallet.createWallet();
 
 console.log(`private key: ${walletOne.privateKey}`);
-console.log(`public key: ${walletOne.publicKey}`)
+console.log(`public key: ${walletOne.publicKey}`);
 
 // give all wallets a balance of 200
 blockchain.mempool = [new Transaction('reward', walletOne.publicKey, 200), new Transaction('reward', walletTwo.publicKey, 200), new Transaction('reward', walletThree.publicKey, 200)];
@@ -81,13 +81,13 @@ app.get('/mempool', (req, res) => {
 });
 
 // get a specific block
-app.get('/block/:id', (req, res) => {
-    res.json(controller.getBlock(req.params.id)).end();
+app.get('/block/:hash', (req, res) => {
+    res.json(controller.getBlock(req.params.hash)).end();
 });
 
 // get a specific transaction
-app.get('/transaction/:id', (req, res) => {
-    res.json(controller.getTransaction(req.params.id)).end();
+app.get('/transaction/:txid', (req, res) => {
+    res.json(controller.getTransaction(req.params.txid)).end();
 });
 
 // get amount of coins in wallet

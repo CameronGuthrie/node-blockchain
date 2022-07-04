@@ -24,15 +24,12 @@ class Controller {
 
     // return block by hash
     getBlock = (hash) => {
-        for (const block of blockchain.chain){
-            if (block.hash === hash) return block;
-        }
-        return `Block with index ${index} not found`;
+        return blockchain.getBlockWithHash(hash) || `Block with index ${index} not found`;
     }
 
     // return all transactions in a block
-    getTransactions = (index) => {
-        return blockchain.getBlock(index).transactions;
+    getTransactions = (hash) => {
+        return blockchain.getBlockWithHash(hash).transactions;
     }
 
     // return transaction by id (hash)
@@ -50,6 +47,9 @@ class Controller {
         return blockchain.getAddressBalance(walletAddress) || 0;
     }
 
+    /*
+        THIS WILL BE MOVED INTO THE WALLET MICROSERVICE EVENTUALLY
+    */
     // send a transaction
     postTransaction = (fromAddress, toAddress, amount, publicKey, privateKey) => {
         const tx = new Transaction(fromAddress, toAddress, amount);
