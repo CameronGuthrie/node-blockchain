@@ -30,15 +30,17 @@ class Transaction {
         // check the wallet has enough balance for transaction
         if (this.amount > blockchain.getAddressBalance(this.fromAddress)) throw new Error('Not enough funds in wallet');
         //sign the transaction (need to create a private key object)
-        this.signature =    crypto.sign(
-                                'sha256', // algorithm
-                                Buffer.from(this.txid, 'hex'), // data
-                                crypto.createPrivateKey({  // private key (need to build an object)
-                                    key: Buffer.from(privateKey, 'hex'), // key from buffer
-                                    format: "der", // format of key
-                                    type: "pkcs8" // type of key
-                                })
-                            );
+        const sign = crypto.createSign('sha256'); // algorithm
+        sign.write(Buffer.from(this.txid, 'hex')); // data
+        sign.end(); // end stream
+        this.signature = sign.sign(
+            crypto.createPrivateKey({  // private key (need to build an object)
+                key: Buffer.from(privateKey, 'hex'), // key from buffer
+                format: "der", // format of key
+                type: "pkcs8" // type of key
+            }),
+            'hex' // signature type
+        );
     }
 
     // validate the transaction
@@ -52,16 +54,19 @@ class Transaction {
         // is the transaction signed?
         if (!this.signature || this.signature.length === 0) throw new Error('Transaction is not signed');
         // return boolean of if transaction signature is verified
-        return  crypto.verify(
-                    'sha256', // algorithm
-                    Buffer.from(this.txid, 'hex'), //data
-                    crypto.createPublicKey({ // public key (need to build an object)
-                        key: Buffer.from(this.fromAddress, 'hex'), // key from buffer
-                        format: 'der', // format of key
-                        type:'spki'// type of key
-                    }), 
-                    this.signature // signature
-                ); 
+
+        const verify = crypto.createVerify('sha256'); // algorithm
+        verify.write(Buffer.from(this.txid, 'hex')); // data
+        verify.end() // stop writing to stream
+        return verify.verify(
+                crypto.createPublicKey({ // public key (need to build an object)
+                key: Buffer.from(this.fromAddress, 'hex'), // key from buffer
+                format: 'der', // format of key
+                type:'spki'// type of key
+            }), 
+            this.signature, // signature
+            'hex' // signature type
+        );
     }
 
 }
