@@ -1,7 +1,7 @@
 'use strict'
 
 // imports
-const crypto = await import('crypto');
+import crypto from 'crypto';
 
 // the block class
 class Block {

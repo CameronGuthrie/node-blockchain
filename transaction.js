@@ -1,7 +1,7 @@
 'use strict'
 
 // imports
-const crypto = await import('crypto');
+import crypto from 'crypto';
 import {blockchain} from './app.js';
 
 class Transaction {

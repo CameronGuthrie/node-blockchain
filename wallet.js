@@ -6,7 +6,7 @@
 */
 
 // imports
-const crypto = await import('crypto');
+import crypto from 'crypto';
 
 const createWallet = () => {
 
