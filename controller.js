@@ -24,7 +24,7 @@ class Controller {
 
     // return block by hash
     getBlock = (hash) => {
-        return blockchain.getBlockWithHash(hash) || `Block with index ${index} not found`;
+        return blockchain.getBlockWithHash(hash) || `Block with hash ${hash} not found`;
     }
 
     // return all transactions in a block
